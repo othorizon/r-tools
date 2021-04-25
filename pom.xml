@@ -81,12 +81,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <!-- jdk1.8要加上，1.7要去掉，否则会报错 -->
+                <!--<configuration>
+                    &lt;!&ndash; jdk1.8要加上，1.7要去掉，否则会报错 &ndash;&gt;
                     <additionalJOptions>
                         <additionalJOption>-Xdoclint:none</additionalJOption>
                     </additionalJOptions>
-                </configuration>
+                </configuration>-->
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -97,7 +97,7 @@
                 </executions>
             </plugin>
             <!-- resources plugin,Maven 资源插件 -->
-            <plugin>
+          <!--  <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
@@ -108,7 +108,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <!-- compiler plugin,Maven 编译插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

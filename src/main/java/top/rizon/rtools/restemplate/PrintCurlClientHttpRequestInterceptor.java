@@ -27,7 +27,7 @@ import java.util.Objects;
  * 使用curl风格打印请求参数
  *
  * @author rizon
- * @date 2021/4/25
+ * @since 0.0.1
  */
 @Slf4j
 public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
@@ -52,6 +52,7 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
 
         /**
          * is default
+         * @return PrintCurlInterceptorBuilder
          */
         public PrintCurlInterceptorBuilder setSingleLine() {
             interceptor.separator = " ";
@@ -65,6 +66,7 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
 
         /**
          * is default
+         * @return PrintCurlInterceptorBuilder
          */
         public PrintCurlInterceptorBuilder setInfoLog() {
             interceptor.debugLog = false;
@@ -72,7 +74,9 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
         }
 
         /**
-         * 忽略header
+         * 附加忽略header 忽略的header key
+         * @param headerKeys 忽略的header key
+         * @return PrintCurlInterceptorBuilder
          */
         public PrintCurlInterceptorBuilder appendIgnoreHeaders(@NonNull List<String> headerKeys) {
             interceptor.ignoreHeaders.addAll(headerKeys);
@@ -80,7 +84,8 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
         }
 
         /**
-         * 忽略header
+         * 设置忽略header
+         * @param headerKeys 忽略的header key
          * @return PrintCurlInterceptorBuilder
          */
         public PrintCurlInterceptorBuilder setIgnoreHeaders(@NonNull List<String> headerKeys) {
@@ -98,7 +103,12 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         try {
-            printCurl(request, body);
+            String curl = toCurl(request, body);
+            if (debugLog) {
+                log.debug("Request-Curl:\n{}", curl);
+            } else {
+                log.info("Request-Curl:\n{}", curl);
+            }
         } catch (Exception ex) {
             log.warn("print curl error", ex);
         }
@@ -106,7 +116,7 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
 
     }
 
-    public void printCurl(HttpRequest request, byte[] body) {
+    public String toCurl(HttpRequest request, byte[] body) {
         List<CObj> cObjects = new ArrayList<>();
 
         //1 method
@@ -126,13 +136,7 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
         cObjects.add(new CBody(separator, request.getHeaders().getContentType(), body));
         cObjects.removeIf(Objects::isNull);
 
-        String logMsg = StringUtils.join(cObjects, separator);
-        if (debugLog) {
-            log.debug("Request-Curl:\n{}", logMsg);
-        } else {
-            log.info("Request-Curl:\n{}", logMsg);
-        }
-
+        return StringUtils.join(cObjects, separator);
     }
 
     public interface CObj {
