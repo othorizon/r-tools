@@ -81,6 +81,7 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
 
         /**
          * 忽略header
+         * @return PrintCurlInterceptorBuilder
          */
         public PrintCurlInterceptorBuilder setIgnoreHeaders(@NonNull List<String> headerKeys) {
             interceptor.ignoreHeaders = headerKeys;
