@@ -25,6 +25,8 @@ r-tools:
 
 ## MockRestTemplateInterceptor
 
+拦截RestTemplate请求返回指定的Mock数据，用于测试环境  
+
 匹配url地址时是包括get请求参数的，可以使用模糊匹配  
 匹配规则见 org.springframework.util.AntPathMatcher  
 示例配置  
