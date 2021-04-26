@@ -11,6 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -31,11 +34,14 @@ import java.util.Objects;
  */
 @Slf4j
 public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+
     private String separator = " ";
     private boolean debugLog = false;
     private List<String> ignoreHeaders = new ArrayList<>(Arrays.asList(
             HttpHeaders.ACCEPT, HttpHeaders.CONTENT_LENGTH
     ));
+    private List<String> urlWishlist = new ArrayList<>();
 
 
     public static PrintCurlInterceptorBuilder builder() {
@@ -51,7 +57,8 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
         }
 
         /**
-         * is default
+         * 默认单行
+         *
          * @return PrintCurlInterceptorBuilder
          */
         public PrintCurlInterceptorBuilder setSingleLine() {
@@ -65,7 +72,8 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
         }
 
         /**
-         * is default
+         * 默认info级别
+         *
          * @return PrintCurlInterceptorBuilder
          */
         public PrintCurlInterceptorBuilder setInfoLog() {
@@ -75,6 +83,7 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
 
         /**
          * 附加忽略header 忽略的header key
+         *
          * @param headerKeys 忽略的header key
          * @return PrintCurlInterceptorBuilder
          */
@@ -85,11 +94,26 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
 
         /**
          * 设置忽略header
+         *
          * @param headerKeys 忽略的header key
          * @return PrintCurlInterceptorBuilder
          */
         public PrintCurlInterceptorBuilder setIgnoreHeaders(@NonNull List<String> headerKeys) {
             interceptor.ignoreHeaders = headerKeys;
+            return this;
+        }
+
+        /**
+         * 设置希望打印curl的url路径pattern，
+         * <p>
+         * 默认全部打印
+         *
+         * @param urlPatterns null或者empty则全部打印
+         * @return PrintCurlInterceptorBuilder
+         * @see AntPathMatcher pattern匹配规则
+         */
+        public PrintCurlInterceptorBuilder setPrintUrlWishlist(@NonNull List<String> urlPatterns) {
+            interceptor.urlWishlist = urlPatterns;
             return this;
         }
 
@@ -103,17 +127,27 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         try {
-            String curl = toCurl(request, body);
-            if (debugLog) {
-                log.debug("Request-Curl:\n{}", curl);
-            } else {
-                log.info("Request-Curl:\n{}", curl);
+            if (needPrint(request)) {
+                String curl = toCurl(request, body);
+                if (debugLog) {
+                    log.debug("Request-Curl:\n{}", curl);
+                } else {
+                    log.info("Request-Curl:\n{}", curl);
+                }
             }
         } catch (Exception ex) {
             log.warn("print curl error", ex);
         }
         return execution.execute(request, body);
 
+    }
+
+    private boolean needPrint(HttpRequest request) {
+        if (CollectionUtils.isEmpty(urlWishlist)) {
+            return true;
+        }
+        String requestUrl = UriComponentsBuilder.fromUri(request.getURI()).replaceQueryParams(null).toUriString();
+        return urlWishlist.stream().anyMatch(url -> PATH_MATCHER.match(url, requestUrl));
     }
 
     public String toCurl(HttpRequest request, byte[] body) {
