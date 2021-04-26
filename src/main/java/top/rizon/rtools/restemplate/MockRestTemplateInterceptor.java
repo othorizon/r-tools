@@ -121,7 +121,13 @@ public class MockRestTemplateInterceptor implements ClientHttpRequestInterceptor
 
     @Data
     public static class MockConf {
+        /**
+         * url pattern
+         */
         private String url;
+        /**
+         * response body
+         */
         private String body;
     }
 }

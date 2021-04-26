@@ -4,6 +4,11 @@
       "name": "r-tools.rest-template.print-curl",
       "type": "top.rizon.rtools.restemplate.PrintCurlClientHttpRequestInterceptor",
       "sourceType": "top.rizon.rtools.restemplate.PrintCurlClientHttpRequestInterceptor"
+    },
+    {
+      "name": "r-tools.rest-template.mock",
+      "type": "top.rizon.rtools.restemplate.MockRestTemplateInterceptor",
+      "sourceType": "top.rizon.rtools.restemplate.MockRestTemplateInterceptor"
     }
   ],
   "properties": [
