@@ -10,6 +10,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
 @ConditionalOnProperty(value = "r-tools.rest-template.print-curl.enable", havingValue = "true", matchIfMissing = true)
 @ConfigurationProperties(prefix = "r-tools.rest-template.print-curl")
 @Slf4j
+@Order
 public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestInterceptor, InitializingBean {
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
     private final RestTemplate restTemplate;

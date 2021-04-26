@@ -7,6 +7,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,7 @@ import java.util.List;
 @ConfigurationProperties(prefix = "r-tools.rest-template.mock")
 @RequiredArgsConstructor
 @Slf4j
+@Order
 public class MockRestTemplateInterceptor implements ClientHttpRequestInterceptor, InitializingBean {
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
     private final RestTemplate restTemplate;
