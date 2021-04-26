@@ -1,5 +1,6 @@
 package top.rizon.rtools.restemplate;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
@@ -11,6 +12,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,6 +25,7 @@ import java.util.Map;
  */
 public class PrintCurlClientHttpRequestInterceptorTest {
     private RestTemplate restTemplate = new RestTemplate();
+    private ByteArrayOutputStream output;
 
     @Before
     public void init() {
@@ -31,16 +35,22 @@ public class PrintCurlClientHttpRequestInterceptorTest {
                         .setSingleLine()
                         .build()
         ));
+
+        output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
     }
 
     @Test
     public void testGet() {
+
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(null, null);
         try {
             restTemplate.exchange("http://localhost/path?p1=1&p2=2", HttpMethod.GET, httpEntity, Object.class);
         } catch (ResourceAccessException ex) {
             //ignore
         }
+        String[] split = output.toString().split("\n");
+        Assert.assertEquals("curl -X GET 'http://localhost/path?p1=1&p2=2'", split[split.length - 1]);
     }
 
     @Test
@@ -56,6 +66,9 @@ public class PrintCurlClientHttpRequestInterceptorTest {
         } catch (ResourceAccessException ex) {
             //ignore
         }
+        String[] split = output.toString().split("\n");
+        Assert.assertEquals("curl -X POST 'http://localhost/path' -H 'Content-Type: application/json' -d '{\"p1\":\"v1\",\"p2\":\"v2\"}'"
+                , split[split.length - 1]);
     }
 
     @Test
@@ -71,6 +84,9 @@ public class PrintCurlClientHttpRequestInterceptorTest {
         } catch (ResourceAccessException ex) {
             //ignore
         }
+        String[] split = output.toString().split("\n");
+        Assert.assertEquals("curl -X POST 'http://localhost/path' -H 'Content-Type: application/x-www-form-urlencoded;charset=UTF-8' --data-urlencode 'p1=\"v1\"' --data-urlencode 'p2=\"v2.1\"' --data-urlencode 'p2=\"v2.2\"'"
+                , split[split.length - 1]);
     }
 
     @Test
@@ -86,5 +102,8 @@ public class PrintCurlClientHttpRequestInterceptorTest {
         } catch (ResourceAccessException ex) {
             //ignore
         }
+        String[] split = output.toString().split("\n");
+        Assert.assertTrue(split[split.length - 1].matches(
+                "curl -X POST 'http://localhost/path' -H 'Content-Type: multipart/form-data;charset=UTF-8;boundary=\\w+' -F 'p1=\"v1\"' -F 'p2=\"v2.1\"' -F 'p2=\"v2.2\"'"));
     }
 }

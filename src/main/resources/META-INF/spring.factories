@@ -1,0 +1,4 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+top.rizon.rtools.restemplate.MockRestTemplateInterceptor,\
+top.rizon.rtools.restemplate.PrintCurlClientHttpRequestInterceptor

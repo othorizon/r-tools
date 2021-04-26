@@ -1,10 +1,15 @@
 package top.rizon.rtools.restemplate;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
@@ -13,6 +18,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.BufferedReader;
@@ -25,17 +31,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 使用curl风格打印请求参数
+ * 默认启用 关闭配置 {@code r-tools.rest-template.print-curl.enable=false }
  *
  * @author rizon
  * @since 0.0.1
  */
+@Data
+@Configuration
+@ConditionalOnProperty(value = "r-tools.rest-template.print-curl.enable", havingValue = "true", matchIfMissing = true)
+@ConfigurationProperties(prefix = "r-tools.rest-template.print-curl")
 @Slf4j
-public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
+public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestInterceptor, InitializingBean {
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+    private final RestTemplate restTemplate;
 
+    private boolean enable = true;
     private String separator = " ";
     private boolean debugLog = false;
     private List<String> ignoreHeaders = new ArrayList<>(Arrays.asList(
@@ -44,12 +58,20 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
     private List<String> urlWishlist = new ArrayList<>();
 
 
+    @Override
+    public void afterPropertiesSet() {
+        if (restTemplate != null) {
+            restTemplate.getInterceptors().add(this);
+            log.info("restTemplate register interceptor: " + this.getClass().getName());
+        }
+    }
+
     public static PrintCurlInterceptorBuilder builder() {
         return new PrintCurlInterceptorBuilder();
     }
 
     public static class PrintCurlInterceptorBuilder {
-        private final PrintCurlClientHttpRequestInterceptor interceptor = new PrintCurlClientHttpRequestInterceptor();
+        private final PrintCurlClientHttpRequestInterceptor interceptor = new PrintCurlClientHttpRequestInterceptor(null);
 
         public PrintCurlInterceptorBuilder setMultiLine() {
             interceptor.separator = " \\\n";
@@ -127,7 +149,7 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         try {
-            if (needPrint(request)) {
+            if (enable && needPrint(request)) {
                 String curl = toCurl(request, body);
                 if (debugLog) {
                     log.debug("Request-Curl:\n{}", curl);
@@ -168,9 +190,8 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
 
         //4 body
         cObjects.add(new CBody(separator, request.getHeaders().getContentType(), body));
-        cObjects.removeIf(Objects::isNull);
-
-        return StringUtils.join(cObjects, separator);
+        return cObjects.stream().map(Object::toString).filter(Objects::nonNull)
+                .collect(Collectors.joining(separator));
     }
 
     public interface CObj {
