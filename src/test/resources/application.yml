@@ -1,0 +1,6 @@
+r-tools:
+  rest-template:
+    print-curl:
+      separator: " \\n"
+
+

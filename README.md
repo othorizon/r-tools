@@ -9,6 +9,7 @@
 r-tools:
   rest-template:
     print-curl:
+      # 默认true
       enable: true
       # 是否改为debug日志 默认info
       debugLog: false
@@ -32,6 +33,7 @@ r-tools:
 r-tools:
   rest-template:
     mock:
+      # 默认false
       enable: true
       conf:
         - url: http://mock.server.com/query?confId=1*

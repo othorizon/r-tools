@@ -1,0 +1,39 @@
+{
+  "groups": [
+    {
+      "name": "r-tools.rest-template.print-curl",
+      "type": "top.rizon.rtools.restemplate.PrintCurlClientHttpRequestInterceptor",
+      "sourceType": "top.rizon.rtools.restemplate.PrintCurlClientHttpRequestInterceptor"
+    }
+  ],
+  "properties": [
+    {
+      "name": "r-tools.rest-template.print-curl.debugLog",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "是否使用debug级别日志.",
+      "sourceType": "top.rizon.rtools.restemplate.PrintCurlClientHttpRequestInterceptor"
+    },
+    {
+      "name": "r-tools.rest-template.print-curl.separator",
+      "type": "java.lang.String",
+      "description": "curl参数之间的分割符号.",
+      "sourceType": "top.rizon.rtools.restemplate.PrintCurlClientHttpRequestInterceptor"
+    }
+  ],
+  "hints": [
+    {
+      "name": "r-tools.rest-template.print-curl.separator",
+      "values": [
+        {
+          "value": " ",
+          "description": "单行打印."
+        },
+        {
+          "value": " \\\\n",
+          "description": "多行打印."
+        }
+      ]
+    }
+  ]
+}

@@ -52,11 +52,23 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
     private final RestTemplate restTemplate;
 
     private boolean enable = true;
+    /**
+     * curl参数之间额分隔符号
+     */
     private String separator = " ";
+    /**
+     * 是否使用debug级别日志
+     */
     private boolean debugLog = false;
+    /**
+     * 打印时忽略header
+     */
     private List<String> ignoreHeaders = new ArrayList<>(Arrays.asList(
             HttpHeaders.ACCEPT, HttpHeaders.CONTENT_LENGTH
     ));
+    /**
+     * 打印url请求名单，为空时所有请求都会打印
+     */
     private List<String> urlWishlist = new ArrayList<>();
 
 
