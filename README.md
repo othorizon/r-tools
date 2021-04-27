@@ -14,7 +14,7 @@ r-tools:
       # 是否改为debug日志 默认info
       debugLog: false
       # 分割符号 默认单行空格分割
-      separator: " \\\n"   
+      separator: " \\n"
       # 不打印的header
       ignoreHeaders: 
         - Accept
