@@ -7,7 +7,7 @@
     <groupId>top.rizon</groupId>
     <artifactId>r-tools</artifactId>
     <!--maven central version: 0.0.2-alpha1-->
-    <version>0.0.2-SNAPSHOT</version>
+    <version>1.1</version>
 
     <licenses>
         <license>
