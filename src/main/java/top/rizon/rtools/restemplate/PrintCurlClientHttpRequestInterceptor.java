@@ -27,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -274,7 +275,7 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
             String[] kvList = StringUtils.split(new String(body), "&");
             for (String kv : kvList) {
                 String[] kvSplit = kv.split("=", 2);
-                results.add(String.format("%s '%s=\"%s\"'", param, kvSplit[0], kvSplit.length > 1 ? kvSplit[1] : ""));
+                results.add(String.format("%s '%s=\"%s\"'", param, kvSplit[0], kvSplit.length > 1 ? URLDecoder.decode(kvSplit[1], "UTF-8") : ""));
             }
             return StringUtils.join(results, separator);
         }
