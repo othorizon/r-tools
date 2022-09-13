@@ -239,6 +239,10 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
 
         @Override
         public String toString() {
+            //fix empty header value not work; If you send the custom header with no-value then its header must be terminated with a semicolon, such as -H "X-Custom-Header;" to send "X-Custom-Header:"
+            if (values == null || values.isEmpty() || values.stream().allMatch(StringUtils::isBlank)) {
+                return String.format("-H '%s;'", key);
+            }
             return String.format("-H '%s: %s'", key, StringUtils.join(values, ";"));
         }
     }
