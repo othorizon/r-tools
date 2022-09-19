@@ -239,7 +239,9 @@ public class PrintCurlClientHttpRequestInterceptor implements ClientHttpRequestI
 
         @Override
         public String toString() {
-            return String.format("-H '%s: %s'", key, StringUtils.join(values, ";"));
+            return String.format("-H '%s: %s'", key,
+                    //curl  header with no-value must be terminated with a semicolon
+                    StringUtils.defaultIfBlank(StringUtils.join(values, ";"),";"));
         }
     }
 

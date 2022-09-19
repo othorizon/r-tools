@@ -60,6 +60,7 @@ public class PrintCurlClientHttpRequestInterceptorTest {
         params.put("p2", "v2");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.add("Empty-Header", null);
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(params, httpHeaders);
         try {
             restTemplate.exchange("http://localhost/path", HttpMethod.POST, httpEntity, Object.class);
@@ -67,7 +68,7 @@ public class PrintCurlClientHttpRequestInterceptorTest {
             //ignore
         }
         String[] split = output.toString().split("\n");
-        Assert.assertEquals("curl -X POST 'http://localhost/path' -H 'Content-Type: application/json' -d '{\"p1\":\"v1\",\"p2\":\"v2\"}'"
+        Assert.assertEquals("curl -X POST 'http://localhost/path' -H 'Empty-Header: ;' -H 'Content-Type: application/json' -d '{\"p1\":\"v1\",\"p2\":\"v2\"}'"
                 , split[split.length - 1]);
     }
 
